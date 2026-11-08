@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Level 4-Week Rotating Revision Tracker | Bio, Chem & OCR Psych</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bio: { light: '#10b981', dark: '#059669', bg: '#ecfdf5', text: '#065f46' },
+                        chem: { light: '#3b82f6', dark: '#2563eb', bg: '#eff6ff', text: '#1e40af' },
+                        psych: { light: '#8b5cf6', dark: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.7); }
+    </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200 custom-scrollbar">
+
+    <div id="app" class="min-h-full flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="p-3 bg-gradient-to-tr from-indigo-600 to-purple-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20">
+                        <i class="fa-solid fa-arrows-rotate text-2xl"></i>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                                A-Level Revision Engine
+                            </h1>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                Y13 Strategy Mode
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                            Biology • Chemistry • OCR Psychology (H567) 4-Week Rotation
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions & Controls -->
+            <div class="flex items-center gap-2 self-end md:self-auto flex-wrap">
+                <!-- Current Week Indicator & Selector -->
+                <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 px-2 flex items-center gap-1">
+                        <i class="fa-regular fa-calendar"></i> Rotation:
+                    </span>
+                    <select id="weekSelector" class="bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs px-2.5 py-1 rounded-lg focus:outline-none border-none cursor-pointer">
+                        <option value="1">Week 1: Y12 Foundations & Core Pairs 1</option>
+                        <option value="2">Week 2: Y13 Energy & Bio Psych</option>
+                        <option value="3">Week 3: Y13 Genes, Acids & OCR Stats</option>
+                        <option value="4">Week 4: Synoptic & Applied Psych</option>
+                    </select>
+                </div>
+
+                <!-- Auto-Rotate Toggle Button -->
+                <button id="btnAutoRotateToggle" class="px-2.5 py-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 rounded-xl hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm" title="Automatically advance week when completed">
+                    <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                    <span id="autoRotateLabel">Auto-Advance: ON</span>
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button id="themeToggle" class="p-2.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm" title="Toggle Dark/Light Mode">
+                    <i id="themeIcon" class="fa-solid fa-moon text-base"></i>
+                </button>
+
+                <!-- Reset Weekly Tasks -->
+                <button id="btnResetWeek" class="px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/60 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-rotate-right text-xs"></i>
+                    <span>Reset Week</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD MASTERY & METRICS -->
+        <section class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Master Progress -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Weekly Task Mastery</span>
+                        <span id="overallWeekPercent" class="text-2xl font-black text-indigo-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-indigo-900/50">
+                        <div id="overallWeekProgressBar" class="bg-gradient-to-r from-indigo-500 to-purple-400 h-full rounded-full transition-all duration-500 w-0"></div>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-indigo-200 flex justify-between items-center">
+                    <span>Completed Scheduled Tasks:</span>
+                    <span id="overallWeekFraction" class="font-bold text-white">0 / 0</span>
+                </div>
+            </div>
+
+            <!-- Subject Mini Progress Cards -->
+            <div class="md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Biology Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-950/50 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Biology (Y12 + Y13)</h3>
+                            </div>
+                            <span id="bioPercent" class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">0%</span>
+                        </div>
+                        <div class="w-full bg-emerald-50 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                            <div id="bioProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500 w-0"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span>Topics Mastered</span>
+                        <span id="bioFraction" class="font-semibold text-slate-700 dark:text-slate-300">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Chemistry Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-blue-100 dark:border-blue-950/50 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Chemistry (Y12 + Y13)</h3>
+                            </div>
+                            <span id="chemPercent" class="text-xs font-extrabold text-blue-600 dark:text-blue-400">0%</span>
+                        </div>
+                        <div class="w-full bg-blue-50 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                            <div id="chemProgressBar" class="bg-blue-500 h-full rounded-full transition-all duration-500 w-0"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span>Topics Mastered</span>
+                        <span id="chemFraction" class="font-semibold text-slate-700 dark:text-slate-300">0/0</span>
+                    </div>
+                </div>
+
+                <!-- OCR Psychology Card -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-purple-100 dark:border-purple-950/50 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">OCR Psych (H567)</h3>
+                            </div>
+                            <span id="psychPercent" class="text-xs font-extrabold text-purple-600 dark:text-purple-400">0%</span>
+                        </div>
+                        <div class="w-full bg-purple-50 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                            <div id="psychProgressBar" class="bg-purple-500 h-full rounded-full transition-all duration-500 w-0"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span>Topics Mastered</span>
+                        <span id="psychFraction" class="font-semibold text-slate-700 dark:text-slate-300">0/0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NAVIGATION TABS -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <!-- Tabs Bar -->
+            <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl self-start overflow-x-auto max-w-full custom-scrollbar">
+                <button data-tab="schedule" class="tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white whitespace-nowrap">
+                    <i class="fa-solid fa-calendar-days mr-1.5 text-indigo-500"></i> Rotating Schedule
+                </button>
+                <button data-tab="syllabus" class="tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-list-check mr-1.5 text-emerald-500"></i> Full Syllabus Matrix
+                </button>
+                <button data-tab="guides" class="tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-lightbulb mr-1.5 text-amber-500"></i> Revision Methods
+                </button>
+                <button data-tab="errorlog" class="tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-bug mr-1.5 text-rose-500"></i> Exam Error Log
+                </button>
+            </div>
+
+            <!-- Controls (Search + Add Custom Task Button) -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1 sm:w-56">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" placeholder="Search topic or study task..." class="w-full pl-8 pr-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400">
+                </div>
+                <button id="btnOpenModal" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20 whitespace-nowrap">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Add Task</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 1: ROTATING REVISION SCHEDULE -->
+        <main id="tab-schedule" class="tab-content mt-6 flex-1">
+            <!-- Day Pills Bar -->
+            <div class="flex items-center justify-between gap-2 mb-6 overflow-x-auto pb-2 custom-scrollbar">
+                <div class="flex items-center gap-1.5">
+                    <button data-day="All" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm whitespace-nowrap">Full Week</button>
+                    <button data-day="Mon" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Mon (Bio Focus)</button>
+                    <button data-day="Tue" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Tue (Chem Focus)</button>
+                    <button data-day="Wed" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Wed (OCR Psych)</button>
+                    <button data-day="Thu" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Thu (Bio/Chem Practice)</button>
+                    <button data-day="Fri" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Fri (OCR Essays)</button>
+                    <button data-day="Sat" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap">Sat (Timed Paper)</button>
+                    <button data-day="Sun" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 whitespace-nowrap">Sun (Reset & Log)</button>
+                </div>
+            </div>
+
+            <!-- Rotation Week Header Banner -->
+            <div id="weekBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/60 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <!-- Injected dynamically -->
+            </div>
+
+            <!-- Quick Advance Banner Action -->
+            <div class="mb-6 flex justify-end">
+                <button id="btnNextWeekBanner" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2">
+                    <span>Complete Week & Advance to Next Rotation</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Scheduled Days Tasks Grid -->
+            <div id="scheduleContainer" class="space-y-6">
+                <!-- Dynamic Days Rendered Here -->
+            </div>
+        </main>
+
+        <!-- TAB CONTENT 2: FULL SYLLABUS CHECKLIST -->
+        <main id="tab-syllabus" class="tab-content mt-6 flex-1 hidden">
+            <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 custom-scrollbar">
+                <button data-subject-filter="all" class="sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm">All Subjects</button>
+                <button data-subject-filter="Biology" class="sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60 hover:bg-emerald-50">Biology</button>
+                <button data-subject-filter="Chemistry" class="sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/60 hover:bg-blue-50">Chemistry</button>
+                <button data-subject-filter="Psychology" class="sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-900/60 hover:bg-purple-50">OCR Psychology (H567)</button>
+            </div>
+
+            <div id="syllabusGrid" class="space-y-8">
+                <!-- Dynamically populated syllabus modules -->
+            </div>
+        </main>
+
+        <!-- TAB CONTENT 3: REVISION METHOD GUIDES -->
+        <main id="tab-guides" class="tab-content mt-6 flex-1 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Blurting & Bio Guide -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-emerald-200 dark:border-emerald-900/50 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-base">
+                        <i class="fa-solid fa-dna text-xl"></i>
+                        <h3>Biology Blurting Technique</h3>
+                    </div>
+                    <ol class="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 list-decimal pl-4">
+                        <li><strong>Pick 1 Specification Bullet:</strong> e.g. <em>Glycolysis & Link Reaction</em>.</li>
+                        <li><strong>Blurt (5 Mins):</strong> Write out every enzyme, substrate, ATP yield, and location from pure memory on a blank sheet.</li>
+                        <li><strong>Green Pen Gap Fill:</strong> Open textbook/notes. Add missed details in green pen. Focus on <em>exact bolded mark scheme terms</em>.</li>
+                        <li><strong>Convert Gaps to Anki:</strong> Immediately turn your green-pen gaps into flashcards for low-energy recall.</li>
+                    </ol>
+                </div>
+
+                <!-- Chemistry Mechanism & Calculation Guide -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-blue-200 dark:border-blue-900/50 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-base">
+                        <i class="fa-solid fa-flask text-xl"></i>
+                        <h3>Chemistry Worked Calculations</h3>
+                    </div>
+                    <ul class="text-xs text-slate-600 dark:text-slate-300 space-y-2.5 list-disc pl-4">
+                        <li><strong>Always write state symbols and units</strong> in intermediate working out.</li>
+                        <li><strong>Mechanism Rules:</strong> Curly arrows <em>MUST</em> start precisely at a lone pair or electron-rich bond and point directly to an electron-deficient atom.</li>
+                        <li><strong>Physical Chemistry (pH, Ka, Kp):</strong> Express numbers to the correct significant figures (usually 3 s.f. in A-Level Chem).</li>
+                        <li><strong>Error Log Rule:</strong> If you lose marks on a unit conversion (e.g. $J \rightarrow kJ$ or $cm^3 \rightarrow dm^3$), write it in the error log immediately.</li>
+                    </ul>
+                </div>
+
+                <!-- OCR Psych GRAVE Framework Guide -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-purple-200 dark:border-purple-900/50 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold text-base">
+                        <i class="fa-solid fa-brain text-xl"></i>
+                        <h3>OCR Psych GRAVE Evaluation</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Use this framework for 10 & 15 mark evaluation essays across all 20 Core Studies:</p>
+                    <div class="text-xs space-y-2 font-medium">
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 rounded-xl"><strong class="text-purple-700 dark:text-purple-300">G - Generalizability:</strong> Sample size, andro/gynocentric, ethos.</div>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 rounded-xl"><strong class="text-purple-700 dark:text-purple-300">R - Reliability:</strong> Standardization, internal consistency, replicate test.</div>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 rounded-xl"><strong class="text-purple-700 dark:text-purple-300">A - Application / Utility:</strong> Real-world usefulness in schools/prisons/hospitals.</div>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 rounded-xl"><strong class="text-purple-700 dark:text-purple-300">V - Validity:</strong> Construct, ecological, demand characteristics.</div>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 rounded-xl"><strong class="text-purple-700 dark:text-purple-300">E - Ethics:</strong> Deception, right to withdraw, protection from harm.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- TAB CONTENT 4: EXAM ERROR LOG -->
+        <main id="tab-errorlog" class="tab-content mt-6 flex-1 hidden">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Exam Paper Error & Misconception Log</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Review this log every Sunday to eliminate recurring mistakes before your exams.</p>
+                    </div>
+                </div>
+
+                <!-- Add Error Form -->
+                <form id="addErrorForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <select id="errSubject" class="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <option value="Biology">Biology</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Psychology">OCR Psychology</option>
+                    </select>
+                    <input type="text" id="errTopic" placeholder="Topic (e.g. Ka calculation or Milgram Ethics)" class="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500" required>
+                    <input type="text" id="errMistake" placeholder="What went wrong? (e.g. forgot state symbols / mark scheme terminology)" class="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 sm:col-span-2" required>
+                    <button type="submit" class="sm:col-span-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl transition shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus text-xs"></i> Log Error for Sunday Review
+                    </button>
+                </form>
+
+                <!-- Error Log Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 font-bold uppercase tracking-wider">
+                                <th class="pb-3 px-2">Subject</th>
+                                <th class="pb-3 px-2">Topic</th>
+                                <th class="pb-3 px-2">Mistake / Correct Action</th>
+                                <th class="pb-3 px-2 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="errorLogTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="mt-auto pt-8 pb-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400">
+            <p>Interactive A-Level Study Engine • Biology, Chemistry & OCR Psychology (H567) • Rotation System</p>
+        </footer>
+    </div>
+
+    <!-- ADD CUSTOM TASK MODAL -->
+    <div id="itemModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-700">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Add Task / Topic</h3>
+                <button id="btnCloseModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="addItemForm" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Subject</label>
+                    <select id="modalSubject" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <option value="Biology">Biology</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Psychology">Psychology (OCR)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Day</label>
+                        <select id="modalDay" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Mon">Monday</option>
+                            <option value="Tue">Tuesday</option>
+                            <option value="Wed">Wednesday</option>
+                            <option value="Thu">Thursday</option>
+                            <option value="Fri">Friday</option>
+                            <option value="Sat">Saturday</option>
+                            <option value="Sun">Sunday</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Rotation Week</label>
+                        <select id="modalWeek" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Task Category Block</label>
+                    <select id="modalBlock" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl">
+                        <option value="15-Min Year 12 Primer">15-Min Year 12 Primer</option>
+                        <option value="75-Min Year 13 Core (Homework/Current Topics)">75-Min Year 13 Core (Homework/Current Topics)</option>
+                        <option value="30-Min Year 12 Practice/Error Log">30-Min Year 12 Practice/Error Log</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Task Title</label>
+                    <input type="text" id="modalTitleInput" placeholder="e.g. Practice pH calculations" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" id="btnCancelModal" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 rounded-xl">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT APPLICATION SCRIPT -->
+    <script>
+        // --- ROTATING 4-WEEK SCHEDULE ENGINE DEFINITION ---
+        const SCHEDULE_ROTATION_DATA = {
+            1: {
+                title: "Week 1: Year 12 Foundations & Core Pairs 1 & 2",
+                description: "Deep-dive into Year 12 fundamental topics: Biological Molecules, Cells, Moles, Energetics, Halogenoalkanes, and OCR Social & Cognitive Core Study Pairs.",
+                days: {
+                    Mon: {
+                        subject: "Biology",
+                        focus: "Module 1 & 2: Molecules & Cell Structure",
+                        blocks: [
+                            { id: "w1_m1", text: "Year 12 Primer (15m): Blurt Carbohydrates, Lipids & Protein Structure", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_m2", text: "Year 13 Core (75m): Respiration Glycolysis & Link Reaction Homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_m3", text: "Year 12 Practice (30m): 3 x Organelles & Microscopy past paper questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Tue: {
+                        subject: "Chemistry",
+                        focus: "Physical & Organic Y12: Moles & Haloalkanes",
+                        blocks: [
+                            { id: "w1_t1", text: "Year 12 Primer (15m): Bonding, Shapes of Molecules & Intermolecular forces Anki", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_t2", text: "Year 13 Core (75m): Born-Haber Cycles & Thermodynamics Homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_t3", text: "Year 12 Practice (30m): 2 x Amount of Substance Titration calculations", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Wed: {
+                        subject: "Psychology",
+                        focus: "OCR Comp 1 Variables & Social Core Pairs",
+                        blocks: [
+                            { id: "w1_w1", text: "Year 12 Primer (15m): GRAVE grid for Milgram (1963) vs Bocchiaro (2012)", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_w2", text: "Year 13 Core (75m): Comp 3 Issues in Mental Health essay plan", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_w3", text: "Year 12 Practice (30m): Practice 5 scenario questions on IV/DV operationalisation", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Thu: {
+                        subject: "Biology",
+                        focus: "Module 2 & 3: Cell Transport & Exchange Systems",
+                        blocks: [
+                            { id: "w1_th1", text: "Year 12 Primer (15m): Active Transport & Osmosis definitions", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_th2", text: "Year 13 Core (75m): Photosynthesis Light-Dependent Reaction homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_th3", text: "Year 12 Practice (30m): Hemoglobin Oxygen Dissociation curves drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Fri: {
+                        subject: "Psychology",
+                        focus: "OCR Core Study Pair: Cognitive Memory & Attention",
+                        blocks: [
+                            { id: "w1_f1", text: "Year 12 Primer (15m): Loftus & Palmer (1974) vs Grant et al. (1998) comparison", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_f2", text: "Year 13 Core (75m): Criminal Psychology turning to crime options homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_f3", text: "Year 12 Practice (30m): Write 10-marker essay outline on Moray vs Simons & Chabris", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sat: {
+                        subject: "Chemistry",
+                        focus: "Energetics, Kinetics & Y12 Organic Analysis",
+                        blocks: [
+                            { id: "w1_s1", text: "Year 12 Primer (15m): Draw Alkenes & Haloalkanes mechanisms", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_s2", text: "Year 13 Core (75m): Rate equations & orders of reaction practice", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_s3", text: "Year 12 Practice (30m): Hess Law ΔH calculations drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sun: {
+                        subject: "Psychology",
+                        focus: "Sunday Reset & Error Log Review",
+                        blocks: [
+                            { id: "w1_su1", text: "Year 12 Primer (15m): Flashcard maintenance across Bio/Chem/Psych", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w1_su2", text: "Sunday Reset (75m): Review Weekly Exam Error Log & populate flashcards", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w1_su3", text: "Planning (30m): Set up tasks & priorities for Week 2 Rotation", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    }
+                }
+            },
+            2: {
+                title: "Week 2: Year 13 Energy Transfers, Thermodynamics & Developmental/Bio Psych",
+                description: "Deep-dive into Y13 topics: Photosynthesis, Respiration, Born-Haber Cycles, Entropies, Thermodynamics, and OCR Developmental/Biological Core Pairs.",
+                days: {
+                    Mon: {
+                        subject: "Biology",
+                        focus: "Module 5: Photosynthesis & Respiration (Y13)",
+                        blocks: [
+                            { id: "w2_m1", text: "Year 12 Primer (15m): Blurt Enzyme kinetics & Competitive inhibition", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_m2", text: "Year 13 Core (75m): Oxidative Phosphorylation & Krebs Cycle deep dive", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_m3", text: "Year 12 Practice (30m): ATP yield & Anaerobic pathways questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Tue: {
+                        subject: "Chemistry",
+                        focus: "Physical Y13: Thermodynamics & Enthalpy",
+                        blocks: [
+                            { id: "w2_t1", text: "Year 12 Primer (15m): Energetics q=mcΔT equation check", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_t2", text: "Year 13 Core (75m): Entropy ΔS & Gibbs Free Energy ΔG calculations", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_t3", text: "Year 12 Practice (30m): Born-Haber cycle calculation questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Wed: {
+                        subject: "Psychology",
+                        focus: "OCR Developmental & Biological Core Studies",
+                        blocks: [
+                            { id: "w2_w1", text: "Year 12 Primer (15m): Bandura (1961) vs Chaney (2004) evaluation", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_w2", text: "Year 13 Core (75m): Medical model vs Non-biological explanations essay", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_w3", text: "Year 12 Practice (30m): Kohlberg vs Lee moral development practice", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Thu: {
+                        subject: "Biology",
+                        focus: "Module 5 & 6: Ecosystems, Neurons & Synapses",
+                        blocks: [
+                            { id: "w2_th1", text: "Year 12 Primer (15m): Cardiac cycle & Tissue fluid recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_th2", text: "Year 13 Core (75m): Action potentials & Cholinergic synapses homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_th3", text: "Year 12 Practice (30m): Nitrogen & Phosphorus cycle mark scheme drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Fri: {
+                        subject: "Psychology",
+                        focus: "OCR Biological Brain Studies & Neural Plasticity",
+                        blocks: [
+                            { id: "w2_f1", text: "Year 12 Primer (15m): Sperry (1968) vs Casey et al. (2011) split brain recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_f2", text: "Year 13 Core (75m): Rosenhan (1973) diagnostic validity analysis", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_f3", text: "Year 12 Practice (30m): Blakemore & Cooper vs Maguire hippocampal study", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sat: {
+                        subject: "Chemistry",
+                        focus: "Rates of Reaction, Rate Equations & Orders",
+                        blocks: [
+                            { id: "w2_s1", text: "Year 12 Primer (15m): Maxwell-Boltzmann distribution curves", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_s2", text: "Year 13 Core (75m): Arrhenius equation ln k = -Ea/RT + ln A plots", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_s3", text: "Year 12 Practice (30m): Initial rates method table questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sun: {
+                        subject: "Psychology",
+                        focus: "Sunday Maintenance",
+                        blocks: [
+                            { id: "w2_su1", text: "Year 12 Primer (15m): Anki deck review across 3 subjects", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w2_su2", text: "Weekly Error Log (75m): Analyze week 2 past paper errors", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w2_su3", text: "Planning (30m): Confirm topics for Week 3 Rotation", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    }
+                }
+            },
+            3: {
+                title: "Week 3: Year 13 Gene Expression, Equilibrium, Acids & OCR Stats",
+                description: "Deep-dive into Y13 topics: Regulation of Gene Expression, Epigenetics, Recombinant DNA, Kp, Ka/Buffers, OCR Inferential Stats & Individual Differences.",
+                days: {
+                    Mon: {
+                        subject: "Biology",
+                        focus: "Module 8: Control of Gene Expression & Epigenetics",
+                        blocks: [
+                            { id: "w3_m1", text: "Year 12 Primer (15m): Transcription & Translation protein synthesis recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_m2", text: "Year 13 Core (75m): Stem cells, Epigenetics & RNA interference homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_m3", text: "Year 12 Practice (30m): Recombinant DNA & PCR past paper questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Tue: {
+                        subject: "Chemistry",
+                        focus: "Physical Y13: Kp, Acids, Bases & pH Calculations",
+                        blocks: [
+                            { id: "w3_t1", text: "Year 12 Primer (15m): Kc expressions & Le Chatelier principle", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_t2", text: "Year 13 Core (75m): Weak acid Ka, pKa & Buffer solution pH calculations", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_t3", text: "Year 12 Practice (30m): Kp partial pressures calculations practice", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Wed: {
+                        subject: "Psychology",
+                        focus: "OCR Comp 1: Inferential Statistics Decision Tree",
+                        blocks: [
+                            { id: "w3_w1", text: "Year 12 Primer (15m): Levels of measurement (Nominal, Ordinal, Interval)", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_w2", text: "Year 13 Core (75m): Stats test selection tree & Sign test calculation", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_w3", text: "Year 12 Practice (30m): Practice 5 inferential stats scenario questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Thu: {
+                        subject: "Biology",
+                        focus: "Module 6: Homeostasis, Blood Glucose & Kidneys",
+                        blocks: [
+                            { id: "w3_th1", text: "Year 12 Primer (15m): Negative feedback loops & Principles of homeostasis", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_th2", text: "Year 13 Core (75m): Nephron ultrafiltration & ADH osmoregulation", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_th3", text: "Year 12 Practice (30m): Insulin, Glucagon & Second messenger cAMP drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Fri: {
+                        subject: "Psychology",
+                        focus: "OCR Core Study Pair: Individual Differences",
+                        blocks: [
+                            { id: "w3_f1", text: "Year 12 Primer (15m): Freud (1909) vs Baron-Cohen (1997) GRAVE grid", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_f2", text: "Year 13 Core (75m): Szasz (2011) myth of mental illness essay outline", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_f3", text: "Year 12 Practice (30m): Gould vs Yerkes intelligence testing bias questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sat: {
+                        subject: "Chemistry",
+                        focus: "Y13 Organic: Aromatic Chemistry & Carbonyls",
+                        blocks: [
+                            { id: "w3_s1", text: "Year 12 Primer (15m): Alcohols oxidation & aldehydes/ketones tests", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_s2", text: "Year 13 Core (75m): Benzene electrophilic substitution & Acylation homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_s3", text: "Year 12 Practice (30m): Nucleophilic addition mechanisms (NaBH4/KCN)", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sun: {
+                        subject: "Biology",
+                        focus: "Weekly Reset",
+                        blocks: [
+                            { id: "w3_su1", text: "Year 12 Primer (15m): Anki recall session", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w3_su2", text: "Weekly Reset (75m): Update exam error log & green pen missing terms", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w3_su3", text: "Planning (30m): Prepare for Week 4 Synoptic & Applied Rotation", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    }
+                }
+            },
+            4: {
+                title: "Week 4: Advanced Y13 Topics, Synoptic Essays & Applied Psych",
+                description: "Deep-dive into Y13 topics: Inheritance/Hardy-Weinberg, Transition Metals, NMR Spectroscopy, OCR Comp 3 Issues in Mental Health & Criminal Psych.",
+                days: {
+                    Mon: {
+                        subject: "Biology",
+                        focus: "Module 7: Inheritance, Speciation & Hardy-Weinberg",
+                        blocks: [
+                            { id: "w4_m1", text: "Year 12 Primer (15m): Monohybrid & Dihybrid genetic cross fundamentals", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_m2", text: "Year 13 Core (75m): Hardy-Weinberg p^2 + 2pq + q^2 = 1 calculations", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_m3", text: "Year 12 Practice (30m): Sex-linkage & Autosomal linkage past paper drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Tue: {
+                        subject: "Chemistry",
+                        focus: "Transition Metals & Ligand Substitution",
+                        blocks: [
+                            { id: "w4_t1", text: "Year 12 Primer (15m): Group 2 & Group 7 trends recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_t2", text: "Year 13 Core (75m): Complex ions, ligand substitution & color origins", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_t3", text: "Year 12 Practice (30m): Redox titrations (MnO4- / Fe2+) calculation drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Wed: {
+                        subject: "Psychology",
+                        focus: "OCR Comp 3: Issues in Mental Health (Section A)",
+                        blocks: [
+                            { id: "w4_w1", text: "Year 12 Primer (15m): DSM vs ICD classification systems recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_w2", text: "Year 13 Core (75m): Gottesman et al. (2010) genetics study deep dive", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_w3", text: "Year 12 Practice (30m): 15-mark essay outline on biological treatments", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Thu: {
+                        subject: "Chemistry",
+                        focus: "NMR Spectroscopy & Chromatography",
+                        blocks: [
+                            { id: "w4_th1", text: "Year 12 Primer (15m): Infrared spectroscopy functional group peaks", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_th2", text: "Year 13 Core (75m): 1H NMR & 13C NMR splitting pattern analysis", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_th3", text: "Year 12 Practice (30m): Chromatography TLC Rf & GC retention times drill", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Fri: {
+                        subject: "Psychology",
+                        focus: "OCR Comp 3 Option: Criminal Psychology (Section B)",
+                        blocks: [
+                            { id: "w4_f1", text: "Year 12 Primer (15m): Raine et al. brain abnormalities study recall", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_f2", text: "Year 13 Core (75m): Memon & Higham cognitive interview homework", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_f3", text: "Year 12 Practice (30m): 15-mark essay outline on witness interrogation", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sat: {
+                        subject: "Biology & Chemistry",
+                        focus: "Full Synoptic Paper Practice",
+                        blocks: [
+                            { id: "w4_s1", text: "Year 12 Primer (15m): Synoptic essay themes brainstorming", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_s2", text: "Year 13 Core (75m): Biology 25-mark synoptic essay outline practice", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_s3", text: "Year 12 Practice (30m): Chemistry Electrochemical cells & E° questions", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    },
+                    Sun: {
+                        subject: "Psychology",
+                        focus: "Full Cycle Review",
+                        blocks: [
+                            { id: "w4_su1", text: "Year 12 Primer (15m): Final Anki review", completed: false, type: "15-Min Year 12 Primer" },
+                            { id: "w4_su2", text: "Full Cycle Reset (75m): Review all logged errors across 4 weeks", completed: false, type: "75-Min Year 13 Core (Homework/Current Topics)" },
+                            { id: "w4_su3", text: "Planning (30m): Reset rotation to Week 1 for next study cycle", completed: false, type: "30-Min Year 12 Practice/Error Log" }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // --- FULL SYLLABUS DATA COVERING EVERY TOPIC (BIOLOGY, CHEMISTRY & OCR PSYCHOLOGY H567) ---
+        const DEFAULT_SYLLABUS = [
+            // ==================== A-LEVEL BIOLOGY (COMPLETE) ====================
+            // Module 1: Biological Molecules
+            { id: 'b1_1', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Monomers, Polymers & Condensation/Hydrolysis Reactions', completed: false },
+            { id: 'b1_2', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Carbohydrates: Monosaccharides, Disaccharides & Polysaccharides (Starch, Glycogen, Cellulose)', completed: false },
+            { id: 'b1_3', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Lipids: Triglycerides, Phospholipids & Emulsion Test', completed: false },
+            { id: 'b1_4', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Proteins: Amino Acid Structure, Peptide Bonds & Primary/Secondary/Tertiary/Quaternary Structure', completed: false },
+            { id: 'b1_5', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Enzymes: Induced Fit Model, Competitive/Non-competitive Inhibitors & Rate Factors', completed: false },
+            { id: 'b1_6', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Nucleic Acids: DNA, RNA & Semi-Conservative DNA Replication (Meselson-Stahl)', completed: false },
+            { id: 'b1_7', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'ATP Structure, Hydrolysis & Synthesis', completed: false },
+            { id: 'b1_8', subject: 'Biology', module: 'Module 1: Biological Molecules', title: 'Water Properties & Inorganic Ions (H+, Fe2+, Na+, PO43-)', completed: false },
+
+            // Module 2: Cells
+            { id: 'b2_1', subject: 'Biology', module: 'Module 2: Cells', title: 'Eukaryotic Cell Structure & Organelle Functions', completed: false },
+            { id: 'b2_2', subject: 'Biology', module: 'Module 2: Cells', title: 'Prokaryotic Cells & Viruses Structure', completed: false },
+            { id: 'b2_3', subject: 'Biology', module: 'Module 2: Cells', title: 'Microscopy: Optical vs Electron (TEM/SEM) & Cell Fractionation/Ultracentrifugation', completed: false },
+            { id: 'b2_4', subject: 'Biology', module: 'Module 2: Cells', title: 'Mitosis & The Cell Cycle (Interphase, Prophase, Metaphase, Anaphase, Telophase)', completed: false },
+            { id: 'b2_5', subject: 'Biology', module: 'Module 2: Cells', title: 'Transport Across Membranes: Diffusion, Facilitated Diffusion, Osmosis & Active Transport (Co-transport)', completed: false },
+            { id: 'b2_6', subject: 'Biology', module: 'Module 2: Cells', title: 'Cell Recognition, Phagocytosis, T Lymphocytes & Cell-Mediated Immunity', completed: false },
+            { id: 'b2_7', subject: 'Biology', module: 'Module 2: Cells', title: 'B Lymphocytes, Antibodies, Humoral Immunity & Vaccination/Monoclonal Antibodies', completed: false },
+
+            // Module 3: Exchange & Transport
+            { id: 'b3_1', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Surface Area to Volume Ratio & Metabolic Rate', completed: false },
+            { id: 'b3_2', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Gas Exchange in Insects (Tracheal System), Fish (Countercurrent Mechanism) & Plants (Stomata)', completed: false },
+            { id: 'b3_3', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Gas Exchange in Mammals (Lungs, Alveoli & Ventilation Mechanism)', completed: false },
+            { id: 'b3_4', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Digestion & Absorption of Carbohydrates, Lipids & Proteins', completed: false },
+            { id: 'b3_5', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Hemoglobin Structure, Oxygen Dissociation Curves & The Bohr Effect', completed: false },
+            { id: 'b3_6', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Mass Transport in Animals: Circulatory System, Heart Structure, Cardiac Cycle & Tissue Fluid', completed: false },
+            { id: 'b3_7', subject: 'Biology', module: 'Module 3: Exchange & Transport', title: 'Mass Transport in Plants: Xylem (Cohesion-Tension) & Phloem (Mass Flow Hypothesis)', completed: false },
+
+            // Module 4: Genetics, Variation & Relationships
+            { id: 'b4_1', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'DNA, Genes, Chromosomes & The Genetic Code (Degenerate, Non-overlapping, Universal)', completed: false },
+            { id: 'b4_2', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'Protein Synthesis: Transcription, Pre-mRNA Splicing & Translation', completed: false },
+            { id: 'b4_3', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'Gene Mutations (Substitution, Deletion) & Chromosome Mutations (Non-disjunction)', completed: false },
+            { id: 'b4_4', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'Meiosis: Crossing Over, Independent Segregation & Genetic Variation', completed: false },
+            { id: 'b4_5', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'Natural Selection, Types of Selection (Directional, Stabilizing) & Adaptations', completed: false },
+            { id: 'b4_6', subject: 'Biology', module: 'Module 4: Genetics & Variation', title: 'Species, Courtship Behaviour, Biodiversity & Taxonomy Classification', completed: false },
+
+            // Module 5: Energy Transfers (Y13)
+            { id: 'b5_1', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Photosynthesis: Light-Dependent Reaction (Photophosphorylation & Photolysis)', completed: false },
+            { id: 'b5_2', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Photosynthesis: Light-Independent Reaction (Calvin Cycle, RuBP, Rubisco, TP)', completed: false },
+            { id: 'b5_3', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Respiration: Glycolysis & The Link Reaction', completed: false },
+            { id: 'b5_4', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Respiration: Krebs Cycle & Oxidative Phosphorylation (Electron Transport Chain)', completed: false },
+            { id: 'b5_5', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Energy Transfers in Ecosystems: Food Webs, GPP, NPP & Farming Efficiency', completed: false },
+            { id: 'b5_6', subject: 'Biology', module: 'Module 5: Energy Transfers (Y13)', title: 'Nutrient Cycles: Nitrogen Cycle (Nitrification, Denitrification, Ammonification) & Phosphorus Cycle', completed: false },
+
+            // Module 6: Response to Changes (Y13)
+            { id: 'b6_1', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Nervous Coordination: Neurons, Resting Potential & Action Potential Generation', completed: false },
+            { id: 'b6_2', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Synaptic Transmission: Cholinergic Synapse, Summation & Inhibitory Synapses', completed: false },
+            { id: 'b6_3', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Receptors: Pacinian Corpuscle & Photoreceptors (Rods and Cones in Retina)', completed: false },
+            { id: 'b6_4', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Muscle Contraction: Myofibril Structure & Sliding Filament Theory', completed: false },
+            { id: 'b6_5', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Homeostasis Principles & Negative Feedback Loops', completed: false },
+            { id: 'b6_6', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Blood Glucose Control: Insulin, Glucagon & Second Messenger Model (cAMP)', completed: false },
+            { id: 'b6_7', subject: 'Biology', module: 'Module 6: Response to Changes (Y13)', title: 'Control of Blood Water Potential: Nephron Structure, Ultrafiltration & ADH Osmoregulation', completed: false },
+
+            // Module 7: Genetics, Populations & Ecosystems (Y13)
+            { id: 'b7_1', subject: 'Biology', module: 'Module 7: Inheritance & Ecosystems (Y13)', title: 'Inheritance: Monohybrid, Dihybrid, Codominance & Multiple Alleles', completed: false },
+            { id: 'b7_2', subject: 'Biology', module: 'Module 7: Inheritance & Ecosystems (Y13)', title: 'Inheritance: Sex-Linkage, Autosomal Linkage & Epistasis', completed: false },
+            { id: 'b7_3', subject: 'Biology', module: 'Module 7: Inheritance & Ecosystems (Y13)', title: 'Hardy-Weinberg Principle & Population Genetics Equations', completed: false },
+            { id: 'b7_4', subject: 'Biology', module: 'Module 7: Inheritance & Ecosystems (Y13)', title: 'Speciation: Allopatric & Sympatric Speciation Mechanisms', completed: false },
+            { id: 'b7_5', subject: 'Biology', module: 'Module 7: Inheritance & Ecosystems (Y13)', title: 'Ecosystems: Populations, Abiotic/Biotic Factors & Ecological Succession', completed: false },
+
+            // Module 8: Control of Gene Expression (Y13)
+            { id: 'b8_1', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Gene Mutations (Frameshift, Addition, Deletion, Substitution)', completed: false },
+            { id: 'b8_2', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Stem Cells: Totipotent, Pluripotent, Multipotent & Induced Pluripotent Stem Cells (iPS)', completed: false },
+            { id: 'b8_3', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Regulation of Transcription: Oestrogen & Epigenetics (DNA Methylation & Histone Acetylation)', completed: false },
+            { id: 'b8_4', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Gene Expression & Cancer: Tumor Suppressor Genes & Proto-oncogenes', completed: false },
+            { id: 'b8_5', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Recombinant DNA Technology: Isolation, Insertion, Transformation & Identification', completed: false },
+            { id: 'b8_6', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Polymerase Chain Reaction (PCR) & Gel Electrophoresis', completed: false },
+            { id: 'b8_7', subject: 'Biology', module: 'Module 8: Gene Expression (Y13)', title: 'Genetic Fingerprinting & Variable Number Tandem Repeats (VNTRs)', completed: false },
+
+
+            // ==================== A-LEVEL CHEMISTRY (COMPLETE) ====================
+            // Physical Chemistry Y12
+            { id: 'c1_1', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Atomic Structure, Isotopes & Time of Flight (TOF) Mass Spectrometry', completed: false },
+            { id: 'c1_2', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Amount of Substance: Moles, Ideal Gas Equation (PV=nRT) & Titrations', completed: false },
+            { id: 'c1_3', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Bonding & Structure: Ionic, Covalent, Metallic & Shapes of Molecules (VSEPR)', completed: false },
+            { id: 'c1_4', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Energetics: Enthalpy Changes (ΔH), Calorimetry & Hess Law Cycles', completed: false },
+            { id: 'c1_5', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Kinetics: Collision Theory, Activation Energy & Maxwell-Boltzmann Distributions', completed: false },
+            { id: 'c1_6', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Chemical Equilibria: Dynamic Equilibrium, Le Chatelier & Kc Expression', completed: false },
+            { id: 'c1_7', subject: 'Chemistry', module: 'Physical Chem: Y12 Foundations', title: 'Redox Reactions, Oxidation States & Half-Equations', completed: false },
+
+            // Physical Chemistry Y13
+            { id: 'c2_1', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Thermodynamics: Born-Haber Cycles, Lattice Enthalpies & Enthalpy of Solution', completed: false },
+            { id: 'c2_2', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Entropy (ΔS) & Free Energy Change (ΔG = ΔH - TΔS) Feasibility', completed: false },
+            { id: 'c2_3', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Rate Equations, Orders of Reaction (0, 1st, 2nd) & Rate Constant (k)', completed: false },
+            { id: 'c2_4', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Arrhenius Equation (ln k vs 1/T plots) & Rate-Determining Step', completed: false },
+            { id: 'c2_5', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Equilibrium Constant Kp for Gas Phase Reactions', completed: false },
+            { id: 'c2_6', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Electrochemical Cells, Electrode Potentials (E°), Commercial Cells & Fuel Cells', completed: false },
+            { id: 'c2_7', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Acids & Bases: Bronsted-Lowry, Kw of Water & pH Calculations', completed: false },
+            { id: 'c2_8', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'Weak Acids (Ka, pKa) & Buffer Solutions pH Calculations', completed: false },
+            { id: 'c2_9', subject: 'Chemistry', module: 'Physical Chem: Y13 Advanced', title: 'pH Titration Curves & Indicator Choice', completed: false },
+
+            // Inorganic Chemistry Y12 & Y13
+            { id: 'c3_1', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Periodicity: Trends in Atomic Radius, Ionisation Energy & Melting Points across Period 3', completed: false },
+            { id: 'c3_2', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Group 2: Alkaline Earth Metals Trends, Hydroxide/Sulfate Solubility & Uses', completed: false },
+            { id: 'c3_3', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Group 7: Halogens Trends, Redox Reactivity & Halide Identification Reactions', completed: false },
+            { id: 'c3_4', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Period 3 Oxides: Reactions with Water, Acids & Bases', completed: false },
+            { id: 'c3_5', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Transition Metals: Characteristics, Complex Ions, Ligand Substitution & Color', completed: false },
+            { id: 'c3_6', subject: 'Chemistry', module: 'Inorganic Chemistry: Y12 & Y13', title: 'Transition Metals: Catalysis (Homogeneous vs Heterogeneous) & Variable Oxidation States', completed: false },
+
+            // Organic Chemistry Y12
+            { id: 'c4_1', subject: 'Chemistry', module: 'Organic Chem: Y12 Foundations', title: 'Alkanes: Fractional Distillation, Cracking & Free Radical Substitution', completed: false },
+            { id: 'c4_2', subject: 'Chemistry', module: 'Organic Chem: Y12 Foundations', title: 'Halogenoalkanes: Nucleophilic Substitution & Elimination Reactions', completed: false },
+            { id: 'c4_3', subject: 'Chemistry', module: 'Organic Chem: Y12 Foundations', title: 'Alkenes: Electrophilic Addition Reactions & Addition Polymers', completed: false },
+            { id: 'c4_4', subject: 'Chemistry', module: 'Organic Chem: Y12 Foundations', title: 'Alcohols: Oxidation Reactions, Elimination (Dehydration) & Ethanol Production', completed: false },
+            { id: 'c4_5', subject: 'Chemistry', module: 'Organic Chem: Y12 Foundations', title: 'Organic Analysis: Infrared (IR) Spectroscopy & Mass Spectrometry', completed: false },
+
+            // Organic Chemistry Y13
+            { id: 'c5_1', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Optical Isomerism: Chirality, Enantiomers & Racemic Mixtures', completed: false },
+            { id: 'c5_2', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Aldehydes & Ketones: Nucleophilic Addition (NaBH4, KCN) & Tollens/Fehling Tests', completed: false },
+            { id: 'c5_3', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Carboxylic Acids & Esters: Esterification, Hydrolysis & Biodiesel', completed: false },
+            { id: 'c5_4', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Acyl Chlorides & Acid Anhydrides: Nucleophilic Addition-Elimination', completed: false },
+            { id: 'c5_5', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Aromatic Chemistry: Benzene Structure, Stability & Electrophilic Substitution', completed: false },
+            { id: 'c5_6', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Amines: Basicity, Preparation & Nucleophilic Substitution', completed: false },
+            { id: 'c5_7', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Polymers: Condensation Polymers (Polyesters & Polyamides) & Biodegradability', completed: false },
+            { id: 'c5_8', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Amino Acids, Proteins, Enzymes & DNA Interaction (Cisplatin)', completed: false },
+            { id: 'c5_9', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Organic Synthesis & Purification Techniques (Reflux, Distillation, Recrystallisation, TLC)', completed: false },
+            { id: 'c5_10', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'NMR Spectroscopy: 1H NMR, 13C NMR, Chemical Shift, Splitting Patterns & Integration', completed: false },
+            { id: 'c5_11', subject: 'Chemistry', module: 'Organic Chem: Y13 Advanced', title: 'Chromatography: Thin Layer (TLC), Gas Chromatography (GC) & HPLC', completed: false },
+
+
+            // ==================== OCR A-LEVEL PSYCHOLOGY (H567 COMPLETE) ====================
+            // Component 1: Research Methods & Inferential Statistics
+            { id: 'p1_1', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Experimental Designs (Repeated, Independent, Matched Pairs) & Settings (Lab, Field, Natural)', completed: false },
+            { id: 'p1_2', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Sampling Methods: Random, Opportunity, Volunteer, Stratified & Sample Bias', completed: false },
+            { id: 'p1_3', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Observational Techniques (Structured/Unstructured, Participant/Non-participant, Covert/Overt)', completed: false },
+            { id: 'p1_4', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Self-Report Methods: Questionnaires, Structured/Unstructured Interviews & Rating Scales', completed: false },
+            { id: 'p1_5', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Correlational Studies & Case Studies', completed: false },
+            { id: 'p1_6', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Variables: IV, DV, Operationalisation, Extraneous & Confounding Variables', completed: false },
+            { id: 'p1_7', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Methodological Issues: Reliability (Test-Retest, Inter-Rater) & Validity (Internal, Ecological, Construct)', completed: false },
+            { id: 'p1_8', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Ethical Issues & BPS Guidelines (Consent, Deception, Debrief, Harm, Confidentiality)', completed: false },
+            { id: 'p1_9', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Levels of Measurement: Nominal, Ordinal & Interval Data', completed: false },
+            { id: 'p1_10', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Inferential Statistics Decision Tree: Sign Test, Chi-Square, Mann-Whitney, Wilcoxon & Spearman Rank', completed: false },
+            { id: 'p1_11', subject: 'Psychology', module: 'Comp 1: Research Methods', title: 'Inferential Stats Calculations & Type I / Type II Errors', completed: false },
+
+            // Component 2: Core Studies (All 10 Themes & 20 Studies)
+            { id: 'p2_1', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Social 1 (Obedience): Milgram (1963) & Bocchiaro et al. (2012)', completed: false },
+            { id: 'p2_2', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Social 2 (Helping Behaviour): Piliavin et al. (1969) & Levine et al. (2001)', completed: false },
+            { id: 'p2_3', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Cognitive 1 (Memory): Loftus & Palmer (1974) & Grant et al. (1998)', completed: false },
+            { id: 'p2_4', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Cognitive 2 (Attention): Moray (1959) & Simons & Chabris (1999)', completed: false },
+            { id: 'p2_5', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Developmental 1 (External Influences): Bandura et al. (1961) & Chaney et al. (2004)', completed: false },
+            { id: 'p2_6', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Developmental 2 (Moral Development): Kohlberg (1968) & Lee et al. (2007)', completed: false },
+            { id: 'p2_7', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Biological 1 (Brain Regions): Sperry (1968) & Casey et al. (2011)', completed: false },
+            { id: 'p2_8', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Biological 2 (Brain Plasticity): Blakemore & Cooper (1970) & Maguire et al. (2000)', completed: false },
+            { id: 'p2_9', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Individual Differences 1 (Understanding Disorders): Freud (1909) & Baron-Cohen et al. (1997)', completed: false },
+            { id: 'p2_10', subject: 'Psychology', module: 'Comp 2: Core Studies (20 Studies)', title: 'Individual Differences 2 (Measuring Differences): Yerkes (1917) & Gould (1982)', completed: false },
+
+            // Component 3: Applied Psychology (Mental Health & Options)
+            { id: 'p3_1', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Mental Health Section A: Historical Views of Mental Illness & Categorisation (DSM/ICD)', completed: false },
+            { id: 'p3_2', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Mental Health Section A: Biological / Medical Model of Mental Illness & Drug Treatments', completed: false },
+            { id: 'p3_3', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Mental Health Section A: Non-Biological Explanations & Psychological Therapies (CBT, Behavioral)', completed: false },
+            { id: 'p3_4', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Mental Health Section A Core Studies: Gottesman et al. (2010), Rosenhan (1973) & Szasz (2011)', completed: false },
+            { id: 'p3_5', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Option - Criminal Psychology: Turning to Crime, Police Interviews & Suspect Interrogation', completed: false },
+            { id: 'p3_6', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Option - Criminal Psychology: Forensic Evidence, Courtroom Factors, Sentences & Prisons', completed: false },
+            { id: 'p3_7', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Option - Child Psychology: Attachment, Brain Development & Intelligence Testing', completed: false },
+            { id: 'p3_8', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Option - Environmental Psychology: Noise, Crowding, Built Environment & Climate', completed: false },
+            { id: 'p3_9', subject: 'Psychology', module: 'Comp 3: Applied Psychology', title: 'Option - Sport Psychology: Arousal/Anxiety, Motivation, Group Dynamics & Coaching', completed: false }
+        ];
+
+        // --- GLOBAL APP STATE ---
+        let appState = {
+            currentWeek: 1,
+            autoRotate: true,
+            activeTab: 'schedule',
+            activeSubjectFilter: 'all',
+            activeDayFilter: 'All',
+            searchQuery: '',
+            darkMode: false,
+            rotationData: SCHEDULE_ROTATION_DATA,
+            syllabus: DEFAULT_SYLLABUS,
+            errorLogs: [
+                { id: 'err1', subject: 'Chemistry', topic: 'pH Calculations', mistake: 'Forgot to take square root of (Ka * [HA]) before calculating -log10[H+].' },
+                { id: 'err2', subject: 'Biology', topic: 'Enzymes', mistake: 'Used the phrase "denatured the active site" instead of "denatured the enzyme / active site changed shape".' },
+                { id: 'err3', subject: 'Psychology', topic: 'OCR Component 1 Stats', mistake: 'Selected Mann-Whitney instead of Wilcoxon for a repeated measures design.' }
+            ]
+        };
+
+        // --- APP INITIALIZATION ---
+        function init() {
+            // Load from LocalStorage
+            const saved = localStorage.getItem('alevel_rotation_tracker_v3');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState.currentWeek = parsed.currentWeek || 1;
+                    appState.autoRotate = parsed.autoRotate !== undefined ? parsed.autoRotate : true;
+                    appState.rotationData = parsed.rotationData || SCHEDULE_ROTATION_DATA;
+                    appState.syllabus = parsed.syllabus || DEFAULT_SYLLABUS;
+                    appState.errorLogs = parsed.errorLogs || [];
+                } catch(e) { console.error('Error loading saved state', e); }
+            }
+
+            // Theme setup
+            const savedTheme = localStorage.getItem('alevel_theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                appState.darkMode = true;
+                document.documentElement.classList.add('dark');
+            } else {
+                appState.darkMode = false;
+                document.documentElement.classList.remove('dark');
+            }
+
+            document.getElementById('weekSelector').value = appState.currentWeek;
+            updateAutoRotateLabel();
+            updateThemeIcon();
+            bindEvents();
+            renderAll();
+        }
+
+        function saveState() {
+            localStorage.setItem('alevel_rotation_tracker_v3', JSON.stringify({
+                currentWeek: appState.currentWeek,
+                autoRotate: appState.autoRotate,
+                rotationData: appState.rotationData,
+                syllabus: appState.syllabus,
+                errorLogs: appState.errorLogs
+            }));
+            renderMetrics();
+        }
+
+        function updateAutoRotateLabel() {
+            const btnLabel = document.getElementById('autoRotateLabel');
+            if (btnLabel) {
+                btnLabel.innerText = appState.autoRotate ? 'Auto-Advance: ON' : 'Auto-Advance: OFF';
+            }
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = appState.darkMode ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-slate-600';
+            }
+        }
+
+        function advanceToNextWeek() {
+            appState.currentWeek = appState.currentWeek >= 4 ? 1 : appState.currentWeek + 1;
+            document.getElementById('weekSelector').value = appState.currentWeek;
+            saveState();
+            renderSchedule();
+        }
+
+        // --- EVENT BINDING ---
+        function bindEvents() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                appState.darkMode = !appState.darkMode;
+                document.documentElement.classList.toggle('dark', appState.darkMode);
+                localStorage.setItem('alevel_theme', appState.darkMode ? 'dark' : 'light');
+                updateThemeIcon();
+            });
+
+            // Week Selector
+            document.getElementById('weekSelector').addEventListener('change', (e) => {
+                appState.currentWeek = parseInt(e.target.value);
+                saveState();
+                renderSchedule();
+            });
+
+            // Auto-Rotate Toggle Button
+            document.getElementById('btnAutoRotateToggle').addEventListener('click', () => {
+                appState.autoRotate = !appState.autoRotate;
+                updateAutoRotateLabel();
+                saveState();
+            });
+
+            // Advance Week Button
+            document.getElementById('btnNextWeekBanner').addEventListener('click', () => {
+                advanceToNextWeek();
+            });
+
+            // Reset Week Tasks
+            document.getElementById('btnResetWeek').addEventListener('click', () => {
+                if (confirm(`Reset all tasks in ${SCHEDULE_ROTATION_DATA[appState.currentWeek].title} to incomplete?`)) {
+                    const weekDays = appState.rotationData[appState.currentWeek].days;
+                    Object.keys(weekDays).forEach(d => {
+                        weekDays[d].blocks.forEach(b => b.completed = false);
+                    });
+                    saveState();
+                    renderSchedule();
+                }
+            });
+
+            // Tabs Switch
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.currentTarget.getAttribute('data-tab');
+                    appState.activeTab = tab;
+
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.className = 'tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap';
+                    });
+                    e.currentTarget.className = 'tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white whitespace-nowrap';
+
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(`tab-${tab}`).classList.remove('hidden');
+                });
+            });
+
+            // Day Filters (Schedule)
+            document.querySelectorAll('.day-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.day-filter-btn').forEach(b => {
+                        b.className = 'day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap';
+                    });
+                    e.currentTarget.className = 'day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm whitespace-nowrap';
+                    appState.activeDayFilter = e.currentTarget.getAttribute('data-day');
+                    renderSchedule();
+                });
+            });
+
+            // Subject Filters (Syllabus)
+            document.querySelectorAll('.sub-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sub-filter-btn').forEach(b => {
+                        b.className = 'sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100';
+                    });
+                    e.currentTarget.className = 'sub-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm';
+                    appState.activeSubjectFilter = e.currentTarget.getAttribute('data-subject-filter');
+                    renderSyllabus();
+                });
+            });
+
+            // Search Filter
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                appState.searchQuery = e.target.value.toLowerCase().trim();
+                renderSchedule();
+                renderSyllabus();
+            });
+
+            // Add Custom Error Form
+            document.getElementById('addErrorForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const subj = document.getElementById('errSubject').value;
+                const topic = document.getElementById('errTopic').value.trim();
+                const mistake = document.getElementById('errMistake').value.trim();
+
+                if (topic && mistake) {
+                    appState.errorLogs.unshift({
+                        id: 'err_' + Date.now(),
+                        subject: subj,
+                        topic: topic,
+                        mistake: mistake
+                    });
+                    saveState();
+                    renderErrorLog();
+                    document.getElementById('addErrorForm').reset();
+                }
+            });
+
+            // Modal Toggles
+            const modal = document.getElementById('itemModal');
+            document.getElementById('btnOpenModal').addEventListener('click', () => modal.classList.remove('hidden'));
+            document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.add('hidden'));
+            document.getElementById('btnCancelModal').addEventListener('click', () => modal.classList.add('hidden'));
+
+            // Add Custom Task Form Submit
+            document.getElementById('addItemForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const subj = document.getElementById('modalSubject').value;
+                const day = document.getElementById('modalDay').value;
+                const week = parseInt(document.getElementById('modalWeek').value);
+                const blockType = document.getElementById('modalBlock').value;
+                const title = document.getElementById('modalTitleInput').value.trim();
+
+                const newTask = {
+                    id: 'custom_' + Date.now(),
+                    text: title,
+                    completed: false,
+                    type: blockType
+                };
+
+                if (appState.rotationData[week] && appState.rotationData[week].days[day]) {
+                    appState.rotationData[week].days[day].blocks.push(newTask);
+                    saveState();
+                    renderSchedule();
+                    modal.classList.add('hidden');
+                    document.getElementById('addItemForm').reset();
+                }
+            });
+        }
+
+        // --- RENDER ALL ---
+        function renderAll() {
+            renderSchedule();
+            renderSyllabus();
+            renderErrorLog();
+            renderMetrics();
+        }
+
+        // --- RENDER ROTATING SCHEDULE ---
+        function renderSchedule() {
+            const container = document.getElementById('scheduleContainer');
+            const weekBanner = document.getElementById('weekBanner');
+            container.innerHTML = '';
+
+            const weekData = appState.rotationData[appState.currentWeek];
+            if (!weekData) return;
+
+            // Render Banner
+            weekBanner.innerHTML = `
+                <div>
+                    <h2 class="text-base sm:text-lg font-extrabold text-indigo-300 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-spin text-amber-400"></i> ${weekData.title}
+                    </h2>
+                    <p class="text-xs text-slate-300 mt-0.5">${weekData.description}</p>
+                </div>
+                <span class="text-xs font-bold px-3 py-1 bg-indigo-900/80 rounded-full border border-indigo-700 text-indigo-200">
+                    Week ${appState.currentWeek} of 4
+                </span>
+            `;
+
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+            days.forEach(dayKey => {
+                if (appState.activeDayFilter !== 'All' && appState.activeDayFilter !== dayKey) return;
+
+                const dayObj = weekData.days[dayKey];
+                if (!dayObj) return;
+
+                // Filter by search query
+                const filteredBlocks = dayObj.blocks.filter(b => 
+                    !appState.searchQuery || 
+                    b.text.toLowerCase().includes(appState.searchQuery) ||
+                    dayObj.subject.toLowerCase().includes(appState.searchQuery) ||
+                    dayObj.focus.toLowerCase().includes(appState.searchQuery)
+                );
+
+                if (appState.searchQuery && filteredBlocks.length === 0) return;
+
+                const dayCard = document.createElement('div');
+                dayCard.className = 'bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4';
+
+                // Subject Badge Class
+                let badgeClass = 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200';
+                if (dayObj.subject === 'Biology') badgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800';
+                if (dayObj.subject === 'Chemistry') badgeClass = 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-300 dark:border-blue-800';
+                if (dayObj.subject === 'Psychology') badgeClass = 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-300 dark:border-purple-800';
+
+                let dayHeader = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/60 gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2.5 py-1 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-lg text-xs font-black tracking-wide">${dayKey}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeClass}">${dayObj.subject}</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">${dayObj.focus}</h3>
+                        </div>
+                    </div>
+                `;
+
+                let blocksHTML = filteredBlocks.map(block => `
+                    <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition group">
+                        <label class="flex items-start gap-3 cursor-pointer flex-1">
+                            <input type="checkbox" data-day="${dayKey}" data-block-id="${block.id}" ${block.completed ? 'checked' : ''} class="schedule-checkbox mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            <div>
+                                <span class="inline-block px-2 py-0.5 mb-1 text-[10px] font-bold rounded bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">${block.type}</span>
+                                <p class="text-xs sm:text-sm font-semibold ${block.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}">
+                                    ${block.text}
+                                </p>
+                            </div>
+                        </label>
+                        <button data-day="${dayKey}" data-delete-id="${block.id}" class="delete-block-btn text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition p-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `).join('');
+
+                dayCard.innerHTML = dayHeader + `<div class="space-y-2">${blocksHTML}</div>`;
+                container.appendChild(dayCard);
+            });
+
+            // Bind Checkbox events
+            document.querySelectorAll('.schedule-checkbox').forEach(chk => {
+                chk.addEventListener('change', (e) => {
+                    const day = e.target.getAttribute('data-day');
+                    const bId = e.target.getAttribute('data-block-id');
+                    const block = appState.rotationData[appState.currentWeek].days[day].blocks.find(b => b.id === bId);
+                    if (block) {
+                        block.completed = e.target.checked;
+                        saveState();
+                        renderMetrics();
+                    }
+                });
+            });
+
+            // Delete task events
+            document.querySelectorAll('.delete-block-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const day = e.currentTarget.getAttribute('data-day');
+                    const dId = e.currentTarget.getAttribute('data-delete-id');
+                    const dayObj = appState.rotationData[appState.currentWeek].days[day];
+                    dayObj.blocks = dayObj.blocks.filter(b => b.id !== dId);
+                    saveState();
+                    renderSchedule();
+                });
+            });
+        }
+
+        // --- RENDER FULL SYLLABUS ---
+        function renderSyllabus() {
+            const container = document.getElementById('syllabusGrid');
+            container.innerHTML = '';
+
+            const filteredSyllabus = appState.syllabus.filter(item => {
+                const matchSubj = appState.activeSubjectFilter === 'all' || item.subject === appState.activeSubjectFilter;
+                const matchSearch = !appState.searchQuery || item.title.toLowerCase().includes(appState.searchQuery) || item.module.toLowerCase().includes(appState.searchQuery);
+                return matchSubj && matchSearch;
+            });
+
+            // Group by Subject -> Module
+            const grouped = {};
+            filteredSyllabus.forEach(item => {
+                if (!grouped[item.subject]) grouped[item.subject] = {};
+                if (!grouped[item.subject][item.module]) grouped[item.subject][item.module] = [];
+                grouped[item.subject][item.module].push(item);
+            });
+
+            Object.keys(grouped).forEach(subj => {
+                const subjSection = document.createElement('div');
+                subjSection.className = 'space-y-4';
+                
+                const totalSubjItems = appState.syllabus.filter(i => i.subject === subj).length;
+                const completedSubjItems = appState.syllabus.filter(i => i.subject === subj && i.completed).length;
+
+                subjSection.innerHTML = `
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                        <h2 class="text-base font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full ${subj === 'Biology' ? 'bg-emerald-500' : subj === 'Chemistry' ? 'bg-blue-500' : 'bg-purple-500'}"></span>
+                            ${subj} Master Spec (Y12 + Y13)
+                        </h2>
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">
+                            ${completedSubjItems} / ${totalSubjItems} Topics Mastered
+                        </span>
+                    </div>
+                `;
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+                Object.keys(grouped[subj]).forEach(modName => {
+                    const items = grouped[subj][modName];
+                    const compCount = items.filter(i => i.completed).length;
+                    
+                    const modCard = document.createElement('div');
+                    modCard.className = 'bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3';
+
+                    const itemsHTML = items.map(i => `
+                        <label class="flex items-start gap-3 cursor-pointer p-1.5 hover:bg-slate-50 dark:hover:bg-slate-700/40 rounded-lg transition">
+                            <input type="checkbox" data-s-id="${i.id}" ${i.completed ? 'checked' : ''} class="syllabus-checkbox mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-xs font-semibold leading-relaxed ${i.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}">${i.title}</span>
+                        </label>
+                    `).join('');
+
+                    modCard.innerHTML = `
+                        <div class="flex justify-between items-center pb-1 border-b border-slate-100 dark:border-slate-700/60">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">${modName}</h4>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full">${compCount}/${items.length}</span>
+                        </div>
+                        <div class="space-y-1">${itemsHTML}</div>
+                    `;
+                    grid.appendChild(modCard);
+                });
+
+                subjSection.appendChild(grid);
+                container.appendChild(subjSection);
+            });
+
+            document.querySelectorAll('.syllabus-checkbox').forEach(chk => {
+                chk.addEventListener('change', (e) => {
+                    const sId = e.target.getAttribute('data-s-id');
+                    const item = appState.syllabus.find(i => i.id === sId);
+                    if (item) {
+                        item.completed = e.target.checked;
+                        saveState();
+                        renderSyllabus();
+                    }
+                });
+            });
+        }
+
+        // --- RENDER ERROR LOG ---
+        function renderErrorLog() {
+            const tableBody = document.getElementById('errorLogTableBody');
+            tableBody.innerHTML = '';
+
+            if (appState.errorLogs.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">No exam errors logged yet. Great job!</td></tr>`;
+                return;
+            }
+
+            appState.errorLogs.forEach(err => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/30 transition';
+
+                let tagColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300';
+                if (err.subject === 'Chemistry') tagColor = 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300';
+                if (err.subject === 'Psychology') tagColor = 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300';
+
+                tr.innerHTML = `
+                    <td class="py-3 px-2 font-bold"><span class="px-2 py-0.5 rounded-full text-[10px] ${tagColor}">${err.subject}</span></td>
+                    <td class="py-3 px-2 font-semibold text-slate-800 dark:text-slate-200">${err.topic}</td>
+                    <td class="py-3 px-2 text-slate-600 dark:text-slate-300">${err.mistake}</td>
+                    <td class="py-3 px-2 text-right">
+                        <button data-del-err="${err.id}" class="delete-err-btn text-slate-400 hover:text-rose-500 p-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            document.querySelectorAll('.delete-err-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-del-err');
+                    appState.errorLogs = appState.errorLogs.filter(err => err.id !== id);
+                    saveState();
+                    renderErrorLog();
+                });
+            });
+        }
+
+        // --- CALCULATE PROGRESS METRICS ---
+        function renderMetrics() {
+            // Weekly Task Metric
+            const weekDays = appState.rotationData[appState.currentWeek].days;
+            let totalTasks = 0;
+            let completedTasks = 0;
+
+            Object.keys(weekDays).forEach(d => {
+                weekDays[d].blocks.forEach(b => {
+                    totalTasks++;
+                    if (b.completed) completedTasks++;
+                });
+            });
+
+            const weekPct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            document.getElementById('overallWeekPercent').innerText = `${weekPct}%`;
+            document.getElementById('overallWeekProgressBar').style.width = `${weekPct}%`;
+            document.getElementById('overallWeekFraction').innerText = `${completedTasks} / ${totalTasks}`;
+
+            // Subject Syllabus Metrics
+            const subjects = ['Biology', 'Chemistry', 'Psychology'];
+            subjects.forEach(subj => {
+                const items = appState.syllabus.filter(i => i.subject === subj);
+                const comp = items.filter(i => i.completed).length;
+                const pct = items.length > 0 ? Math.round((comp / items.length) * 100) : 0;
+
+                const pref = subj.toLowerCase().substring(0, 4);
+                const bar = document.getElementById(`${pref}ProgressBar`);
+                const txt = document.getElementById(`${pref}Percent`);
+                const frac = document.getElementById(`${pref}Fraction`);
+
+                if (bar) bar.style.width = `${pct}%`;
+                if (txt) txt.innerText = `${pct}%`;
+                if (frac) frac.innerText = `${comp}/${items.length}`;
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
